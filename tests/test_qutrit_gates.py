@@ -1,6 +1,6 @@
 import cirq
 import numpy as np
-from prototype.qutrit_gates import SingleQubitGateToQutritGate, TwoQubitGateToQutritGate
+from ops.to_qutrit_wrappers import SingleQubitGateToQutritGate, TwoQubitGateToQutritGate
 from prototype.noise_model import GokhaleNoiseModelOnQutrits, HardwareAwareSymmetricNoise
 import pytest
 
