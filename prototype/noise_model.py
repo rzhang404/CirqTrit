@@ -62,7 +62,7 @@ class QutritMixtureChannel(cirq.Gate):  # Can't inherit from SingleQubitGate
     """
     def __init__(self, errors, error_weights):
         assert .999 < sum(error_weights) < 1.001
-        self.mixture = tuple(zip(errors, error_weights))
+        self.mixture = tuple(zip(error_weights, errors))
         if errors[0].shape == (3, 3):
             self.shape = (3,)  # One-qutrit mixture
         elif errors[0].shape == (9, 9):
@@ -184,12 +184,12 @@ class GokhaleNoiseModelOnQutrits(cirq.NoiseModel):
             if op_dim == 1:
                 # weighted_draw(self.single_qutrit_error_weights) # only works for stochastic, not full density sim
                 gate_moment = gate_moment.with_operation(
-                    QutritMixtureChannel(single_qutrit_kraus_operators,
-                                         self.single_qutrit_error_weights).on(*op.qubits))
+                    QutritMixtureChannel(error_weights=self.single_qutrit_error_weights,
+                                         errors=single_qutrit_kraus_operators).on(*op.qubits))
             elif op_dim == 2:
                 gate_moment = gate_moment.with_operations(
-                    QutritMixtureChannel(two_qutrit_kraus_operators,
-                                         self.two_qutrit_error_weights).on(*op.qubits))
+                    QutritMixtureChannel(error_weights=self.two_qutrit_error_weights,
+                                         errors=two_qutrit_kraus_operators).on(*op.qubits))
 
         effective_noise_moments.append(gate_moment)
 
@@ -259,14 +259,16 @@ class HardwareAwareSymmetricNoise(cirq.NoiseModel):
             max_op_dim = max(max_op_dim, op_dim)
             if op_dim == 1:
                 p_1 = self.single_qutrit_error_rates[op.qubits[0]]
+                error_weights = [1 - 8 * p_1] + 8 * [p_1]
                 gate_moment = gate_moment.with_operation(
-                    QutritMixtureChannel(single_qutrit_kraus_operators,
-                                         [1 - 8 * p_1] + 8 * [p_1]).on(*op.qubits))
+                    QutritMixtureChannel(error_weights=error_weights,
+                                         errors=single_qutrit_kraus_operators).on(*op.qubits))
             elif op_dim == 2:
                 p_2 = self.two_qutrit_error_rates[op.qubits[0]][op.qubits[1]]
+                error_weights = [1 - 80 * p_2] + 80 * [p_2]
                 gate_moment = gate_moment.with_operations(
-                    QutritMixtureChannel(two_qutrit_kraus_operators,
-                                         [1 - 80 * p_2] + 80 * [p_2]).on(*op.qubits))
+                    QutritMixtureChannel(error_weights=error_weights,
+                                         errors=two_qutrit_kraus_operators).on(*op.qubits))
 
         effective_noise_moments.append(gate_moment)
 

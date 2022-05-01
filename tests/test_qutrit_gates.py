@@ -49,7 +49,7 @@ def test_qutrit_noise_model(args):
     noisy_sim = cirq.DensityMatrixSimulator(noise=noise_model)
     noisy_result = noisy_sim.simulate(circtrit).final_density_matrix
     assert not np.allclose(noisy_result, ideal_matrix)
-    print(noisy_result, np.trace(noisy_result))
+    print(np.trace(noisy_result), sum(sum(noisy_result)))
     assert np.isclose(np.trace(noisy_result), 1.0)
     print(cirq.qis.fidelity(ideal_matrix,
                             noisy_result,
