@@ -92,12 +92,6 @@ def qutrit_to_qubit(circuit: cirq.AbstractCircuit, *, context=None) -> cirq.Circ
         new_gate = None
         qubits = None
 
-        # Check if already was wrapped, returning to qutrit
-        if (
-            type(wrapped_gate) == SingleQubitGateToQutritGate
-            or type(wrapped_gate) == TwoQubitGateToQutritGate
-        ):
-            new_gate = wrapped_gate.base_gate
 
         # Generate qubits of the same type
         if len(qutrits) == 1:
@@ -117,6 +111,13 @@ def qutrit_to_qubit(circuit: cirq.AbstractCircuit, *, context=None) -> cirq.Circ
                     cirq.GridQubit(qutrits[0].row, qutrits[0].col),
                     cirq.GridQubit(qutrits[1].row, qutrits[1].col),
                 ]
+
+        # Check if already was wrapped, returning to qutrit
+        if (
+            type(wrapped_gate) == SingleQubitGateToQutritGate
+            or type(wrapped_gate) == TwoQubitGateToQutritGate
+        ):
+            new_gate = wrapped_gate.base_gate
 
         else:
             # Need to wrap this in a qubit gate

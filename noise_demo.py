@@ -27,12 +27,12 @@ noise_simulable_gate_domain = {
     TwoQubitGateToQutritGate(cirq.CZ): 2,
     TwoQubitGateToQutritGate(cirq.SWAP): 2,
     TwoQubitGateToQutritGate(cirq.ISWAP): 2,
-    # QutritPlusGate: 1,
-    # OneControlledPlusGate: 2,
-    # TwoControlledPlusGate: 2,
-    # QutritMinusGate: 1,
-    # OneControlledMinusGate: 2,
-    # TwoControlledMinusGate: 2,
+    QutritPlusGate: 1,
+    OneControlledPlusGate: 2,
+    TwoControlledPlusGate: 2,
+    QutritMinusGate: 1,
+    OneControlledMinusGate: 2,
+    TwoControlledMinusGate: 2,
 }
 circuit = cirq.testing.random_circuit(
     qubits=qutrits,
@@ -43,8 +43,8 @@ circuit = cirq.testing.random_circuit(
 
 print("Generated circuit:", circuit)
 
-# Build error weights
-edges = [(qutrits[0], qutrits[1]), (qutrits[1], qutrits[2])]
+# Build error weight
+edges = [(i, j) for i in qutrits for j in qutrits]
 single_qutrit_error_dict = dict()
 two_qutrit_error_dict = dict()
 p_1 = 0.001 / 3
