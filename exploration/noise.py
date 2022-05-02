@@ -3,10 +3,7 @@ import numpy as np
 from noise_models.hardware_aware import GokhaleNoiseModelOnQubits
 
 qubits = cirq.LineQid.range(3, dimension=2)
-circuit = cirq.Circuit(
-    cirq.X(qubits[0]),
-    cirq.CNOT(qubits[0], qubits[1])
-)
+circuit = cirq.Circuit(cirq.X(qubits[0]), cirq.CNOT(qubits[0], qubits[1]))
 
 noise_model = cirq.AmplitudeDampingChannel(0.01)
 noise_model = GokhaleNoiseModelOnQubits(0.09, 0.1)
