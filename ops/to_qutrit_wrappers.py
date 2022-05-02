@@ -30,7 +30,7 @@ class SingleQubitGateToQutritGate(cirq.Gate):
         return self.qt_unitary
 
     def _circuit_diagram_info_(self, args):
-        return '{}(01)'.format(str(self.base_gate))
+        return "{}(01)".format(str(self.base_gate))
 
 
 class TwoQubitGateToQutritGate(cirq.Gate):
@@ -47,7 +47,9 @@ class TwoQubitGateToQutritGate(cirq.Gate):
         assert cirq.num_qubits(gate) == 2
         qb_unitary = cirq.unitary(gate)
 
-        qt_unitary = np.eye(9, dtype=np.complex128)  # Default: anything involving 2 state is identity
+        qt_unitary = np.eye(
+            9, dtype=np.complex128
+        )  # Default: anything involving 2 state is identity
         qt_unitary[0:2, 0:2] = qb_unitary[0:2, 0:2]  # {|00>, |01>}{<00|, <01|}
         qt_unitary[3:5, 0:2] = qb_unitary[2:4, 0:2]  # {|10>, |11>}{<00|, <01|}
         qt_unitary[0:2, 3:5] = qb_unitary[0:2, 2:4]  # {|00>, |01>}{<10|, <11|}
@@ -56,7 +58,10 @@ class TwoQubitGateToQutritGate(cirq.Gate):
         self.qt_unitary = qt_unitary
 
     def _qid_shape_(self) -> Tuple[int, ...]:
-        return (3, 3,)
+        return (
+            3,
+            3,
+        )
 
     def _unitary_(self):
         return self.qt_unitary
@@ -66,23 +71,20 @@ class TwoQubitGateToQutritGate(cirq.Gate):
             if symbol == "@":
                 return "@(1)"  # Controlled on |1>
             else:
-                return '{}(01)'.format(symbol)
+                return "{}(01)".format(symbol)
 
         qubit_diagram_info = cirq.circuit_diagram_info(self.base_gate)
         new_wire_symbols = (wrap_wire_symbol(symbol) for symbol in qubit_diagram_info.wire_symbols)
         return qubit_diagram_info.with_wire_symbols(new_wire_symbols)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     qutrits = cirq.LineQid.range(3, dimension=3)
 
     X3 = SingleQubitGateToQutritGate(cirq.X)
     CNOT3 = TwoQubitGateToQutritGate(cirq.CNOT)
 
-    circtrit = cirq.Circuit(
-        X3(qutrits[0]),
-        CNOT3(qutrits[0], qutrits[1])
-    )
+    circtrit = cirq.Circuit(X3(qutrits[0]), CNOT3(qutrits[0], qutrits[1]))
 
     non_noisy_simulator = cirq.DensityMatrixSimulator()
 

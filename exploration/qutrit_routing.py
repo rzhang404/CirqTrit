@@ -20,7 +20,7 @@ from ops.ternary_gates import (
     OneControlledMinusGate,
     TwoControlledMinusGate,
 )
-from prototype.dimension_transform import qutrit_to_qubit, qubit_to_qutrit
+from transformations.dimension_transform import qutrit_to_qubit, qubit_to_qutrit
 from noise_models.gokhale_qutrit import GokhaleNoiseModelOnQutrits
 
 

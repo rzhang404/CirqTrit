@@ -15,10 +15,7 @@ def args():
     ideal_matrix = np.zeros((9, 9), dtype=np.complex128)
     ideal_matrix[4, 4] = 1.0  # |11>
 
-    return qutrits, cirq.Circuit(
-        X3(qutrits[0]),
-        CNOT3(qutrits[0], qutrits[1])
-    ), ideal_matrix
+    return qutrits, cirq.Circuit(X3(qutrits[0]), CNOT3(qutrits[0], qutrits[1])), ideal_matrix
 
 
 def test_wrapped_execution(args):
@@ -33,11 +30,11 @@ def test_wrapped_execution(args):
 def test_qutrit_noise_model(args):
     qutrits, circtrit, ideal_matrix = args
 
-    p_1 = .001 / 3
-    p_2 = .01 / 15
+    p_1 = 0.001 / 3
+    p_2 = 0.01 / 15
     noise_model = GokhaleNoiseModelOnQutrits(
-        single_qutrit_error_weights=[1 - p_1] + 8 * [p_1/8],
-        two_qutrit_error_weights=[1 - p_2] + 80 * [p_2/80],
+        single_qutrit_error_weights=[1 - p_1] + 8 * [p_1 / 8],
+        two_qutrit_error_weights=[1 - p_2] + 80 * [p_2 / 80],
         lambda_short=100.0 / 10000.0,
         lambda_long=300.0 / 10000.0,
     )
@@ -45,7 +42,9 @@ def test_qutrit_noise_model(args):
     noisy_result = noisy_sim.simulate(circtrit).final_density_matrix
     assert not np.allclose(noisy_result, ideal_matrix)
     assert np.isclose(np.trace(noisy_result), 1.0), np.trace(noisy_result)
-    print("Resulting fidelity:", cirq.qis.fidelity(ideal_matrix, noisy_result,(len(ideal_matrix),)))
+    print(
+        "Resulting fidelity:", cirq.qis.fidelity(ideal_matrix, noisy_result, (len(ideal_matrix),))
+    )
 
 
 def test_parameterized_noise(args):
@@ -53,17 +52,19 @@ def test_parameterized_noise(args):
     edges = [(qutrits[0], qutrits[1]), (qutrits[1], qutrits[2])]
     single_qutrit_error_dict = dict()
     two_qutrit_error_dict = dict()
-    p_1 = .001 / 3
-    p_2 = .01 / 15
+    p_1 = 0.001 / 3
+    p_2 = 0.01 / 15
     for q in qutrits:
-        single_qutrit_error_dict[q] = np.random.uniform(0, p_1)  # initialize single body gate errors
-        # single_qutrit_error_dict[q] = np.random.random()
+        single_qutrit_error_dict[q] = np.random.uniform(
+            0, p_1
+        )  # initialize single body gate errors
         two_qutrit_error_dict[q] = dict()  # initialize next level of dicts
     for e in edges:
         edge_error = np.random.uniform(0, p_2)
-        # edge_error = np.random.random()
         two_qutrit_error_dict[e[0]][e[1]] = edge_error
-        two_qutrit_error_dict[e[1]][e[0]] = edge_error  # set two-body gate errors for both directions
+        two_qutrit_error_dict[e[1]][
+            e[0]
+        ] = edge_error  # set two-body gate errors for both directions
 
     noise_model = HardwareAwareSymmetricNoise(
         single_qutrit_hardware_error_rates=single_qutrit_error_dict,
@@ -76,4 +77,6 @@ def test_parameterized_noise(args):
     noisy_result = noisy_sim.simulate(circtrit).final_density_matrix
     assert not np.allclose(noisy_result, ideal_matrix)
     assert np.isclose(np.trace(noisy_result), 1.0), np.trace(noisy_result)
-    print("Resulting fidelity:", cirq.qis.fidelity(ideal_matrix, noisy_result,(len(ideal_matrix),)))
+    print(
+        "Resulting fidelity:", cirq.qis.fidelity(ideal_matrix, noisy_result, (len(ideal_matrix),))
+    )

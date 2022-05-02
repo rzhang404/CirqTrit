@@ -14,22 +14,16 @@ pip install -r requirements.txt
 
 ## Usage
 
+To see a demonstration of hardware aware noise model in simulation, use the command:
+
 ```python
-import foobar
-
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
+python noise_demo.py
 ```
 
-[comment]: <> (todo: credit epiqc for kraus operators)
-
-### Noise Models
+To see a demonstration of routing for gates it is currently possible to route, use the command:
+```python
+python routing_demo.py
+```
 
 
 ## License
@@ -37,4 +31,7 @@ foobar.singularize('phenomena')
 
 ## Open-Source Credit
 With thanks to Cambridge Quantum Computing for their open-source `pytket-cirq` conversion code,
-modified for extension and used under the same license.
+modified for extension and used under the same license,
+
+and thanks to the Cirq Developers for providing the ternary Pauli operators and experimental data 
+used for development of our noise model, as well as the codebase on which we extend.
