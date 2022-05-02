@@ -5,7 +5,7 @@ from pytket.extensions.cirq import cirq_to_tk, tk_to_cirq  # interesting, invest
 from pytket.predicates import CompilationUnit, ConnectivityPredicate
 from pytket.passes import PlacementPass, RoutingPass
 from pytket.routing import GraphPlacement
-from prototype.noise_model import GokhaleNoiseModelOnQubits
+from noise_models.hardware_aware import GokhaleNoiseModelOnQubits
 from ops.to_qutrit_wrappers import (
     SingleQubitGateToQutritGate,
     TwoQubitGateToQutritGate,

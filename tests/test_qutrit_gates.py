@@ -1,8 +1,10 @@
 import cirq
 import numpy as np
 from ops.to_qutrit_wrappers import SingleQubitGateToQutritGate, TwoQubitGateToQutritGate
-from prototype.noise_model import GokhaleNoiseModelOnQutrits, HardwareAwareSymmetricNoise
+from noise_models.hardware_aware import HardwareAwareSymmetricNoise
+from noise_models.gokhale_qutrit import GokhaleNoiseModelOnQutrits
 import pytest
+
 
 @pytest.fixture
 def args():
@@ -27,33 +29,24 @@ def test_wrapped_execution(args):
     final_density_matrix = sim.simulate(circtrit).final_density_matrix
     assert np.allclose(final_density_matrix, ideal_matrix)
 
+
 def test_qutrit_noise_model(args):
     qutrits, circtrit, ideal_matrix = args
 
     p_1 = .001 / 3
     p_2 = .01 / 15
-    # p_1 = 0
-    # p_2 = 0
     noise_model = GokhaleNoiseModelOnQutrits(
-        # gamma_1_short=1 - np.exp(-1 * 100.0 / 100000.0),
-        # gamma_1_long=1 - np.exp(-1 * 300.0 / 100000.0),
-        # gamma_2_short=1 - np.exp(-2 * 100.0 / 100000.0),
-        # gamma_2_long=1 - np.exp(-2 * 300.0 / 100000.0),
-        gamma_1_short=0,
-        gamma_1_long=0,
-        gamma_2_short=0,
-        gamma_2_long=0,
-        single_qutrit_error_weights=[1 - 8*p_1] + 8 * [p_1],
-        two_qutrit_error_weights=[1 - 80*p_2] + 80 * [p_2],
+        single_qutrit_error_weights=[1 - p_1] + 8 * [p_1/8],
+        two_qutrit_error_weights=[1 - p_2] + 80 * [p_2/80],
+        lambda_short=100.0 / 10000.0,
+        lambda_long=300.0 / 10000.0,
     )
     noisy_sim = cirq.DensityMatrixSimulator(noise=noise_model)
     noisy_result = noisy_sim.simulate(circtrit).final_density_matrix
     assert not np.allclose(noisy_result, ideal_matrix)
-    print(np.trace(noisy_result), sum(sum(noisy_result)))
-    assert np.isclose(np.trace(noisy_result), 1.0)
-    print(cirq.qis.fidelity(ideal_matrix,
-                            noisy_result,
-                            (len(ideal_matrix),)))
+    assert np.isclose(np.trace(noisy_result), 1.0), np.trace(noisy_result)
+    print("Resulting fidelity:", cirq.qis.fidelity(ideal_matrix, noisy_result,(len(ideal_matrix),)))
+
 
 def test_parameterized_noise(args):
     qutrits, circtrit, ideal_matrix = args
@@ -73,13 +66,14 @@ def test_parameterized_noise(args):
         two_qutrit_error_dict[e[1]][e[0]] = edge_error  # set two-body gate errors for both directions
 
     noise_model = HardwareAwareSymmetricNoise(
-        single_qutrit_error_rates=single_qutrit_error_dict,
-        two_qutrit_error_rates=two_qutrit_error_dict
+        single_qutrit_hardware_error_rates=single_qutrit_error_dict,
+        two_qutrit_hardware_error_rates=two_qutrit_error_dict,
+        lambda_short=100.0 / 10000.0,
+        lambda_long=300.0 / 10000.0,
     )
 
     noisy_sim = cirq.DensityMatrixSimulator(noise=noise_model)
     noisy_result = noisy_sim.simulate(circtrit).final_density_matrix
-    print(noisy_result)
     assert not np.allclose(noisy_result, ideal_matrix)
-    print(noisy_result, np.trace(noisy_result))
-    assert np.isclose(np.trace(noisy_result), 1.0)
+    assert np.isclose(np.trace(noisy_result), 1.0), np.trace(noisy_result)
+    print("Resulting fidelity:", cirq.qis.fidelity(ideal_matrix, noisy_result,(len(ideal_matrix),)))

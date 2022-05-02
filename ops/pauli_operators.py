@@ -14,7 +14,7 @@ Z3 = np.array(
 Y3 = X3 @ Z3
 V3 = X3 @ Z3 @ Z3
 
-single_qutrit_kraus_operators = [
+single_qutrit_pauli_operators = [
     np.eye(3),
     Z3,
     Z3 @ Z3,
@@ -25,7 +25,7 @@ single_qutrit_kraus_operators = [
     X3 @ X3 @ Z3,
     X3 @ X3 @ Z3 @ Z3,
 ]
-two_qutrit_kraus_operators = [
+two_qutrit_pauli_operators = [
     np.kron(np.eye(3), np.eye(3)),
     np.kron(np.eye(3), Z3),
     np.kron(np.eye(3), Z3 @ Z3),

@@ -1,6 +1,6 @@
 import cirq
 import numpy as np
-from prototype.noise_model import GokhaleNoiseModelOnQubits
+from noise_models.hardware_aware import GokhaleNoiseModelOnQubits
 
 qubits = cirq.LineQid.range(3, dimension=2)
 circuit = cirq.Circuit(
