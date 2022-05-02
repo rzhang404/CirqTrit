@@ -68,19 +68,3 @@ def qutrit_to_qubit(
     transformed_circuit = circuit.unfreeze(copy=True)
     transformed_circuit.batch_replace(batch_replace)
     return transformed_circuit
-
-
-if __name__ == '__main__':
-    qubits = cirq.LineQubit.range(2)
-    circuit = cirq.Circuit(
-        cirq.X(qubits[0]),
-        cirq.X(qubits[1]),
-        cirq.X(qubits[1]),
-        cirq.CNOT(qubits[0], qubits[1]),
-        cirq.Y(cirq.LineQubit(4))
-    )
-    circtrit = qubit_to_qutrit(circuit)
-    print(circtrit)
-    revcirc = qutrit_to_qubit(circtrit)
-    print(revcirc)
-
