@@ -36,8 +36,8 @@ class TwoQutritGateToQubitGate(cirq.Gate):
 
     def _qid_shape_(self) -> Tuple[int, ...]:
         return (
-            3,
-            3,
+            2,
+            2,
         )
 
     def _unitary_(self):

@@ -92,7 +92,6 @@ def qutrit_to_qubit(circuit: cirq.AbstractCircuit, *, context=None) -> cirq.Circ
         new_gate = None
         qubits = None
 
-
         # Generate qubits of the same type
         if len(qutrits) == 1:
             if q_type is cirq.LineQid:

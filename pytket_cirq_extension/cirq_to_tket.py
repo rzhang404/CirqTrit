@@ -27,6 +27,8 @@ from pytket_cirq_extension.conversion_mappings import (
     _constant_gates,
     _cirq2ops_mapping,
 )
+from pytket.circuit import CustomGateDef, CustomGate
+from ops.to_qubit_wrappers import SingleQutritGateToQubitGate, TwoQutritGateToQubitGate
 
 
 def cirq_to_tk(circuit: cirq.circuits.Circuit) -> Circuit:
@@ -106,6 +108,16 @@ def cirq_to_tk(circuit: cirq.circuits.Circuit) -> Circuit:
             elif isinstance(gate, cirq.ops.PhasedISwapPowGate):
                 optype = OpType.PhasedISWAP
                 params = [gate.phase_exponent, gate.exponent]
+            elif isinstance(gate, SingleQutritGateToQubitGate):
+                dummy_sub_circ = Circuit()
+                gate_def = CustomGateDef.define(str(gate.base_gate), dummy_sub_circ, [])
+                tkcirc.add_custom_gate(gate_def, [], qb_lst)
+                continue
+            elif isinstance(gate, TwoQutritGateToQubitGate):
+                dummy_sub_circ = Circuit()
+                gate_def = CustomGateDef.define(str(gate.base_gate), dummy_sub_circ, [])
+                tkcirc.add_custom_gate(gate_def, [], qb_lst)
+                continue
             else:
                 try:
                     optype = _cirq2ops_mapping[gatetype]

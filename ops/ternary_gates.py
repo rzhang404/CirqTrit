@@ -18,6 +18,7 @@ class QutritPlusGateClass(cirq.Gate):
     def _circuit_diagram_info_(self, args):
         return "[+1]"
 
+
 QutritPlusGate = QutritPlusGateClass()
 
 OneControlledPlusGate = cirq.ControlledGate(
@@ -43,6 +44,7 @@ class QutritMinusGateClass(cirq.Gate):
 
     def _circuit_diagram_info_(self, args):
         return "[-1]"
+
 
 QutritMinusGate = QutritMinusGateClass()
 
@@ -82,6 +84,7 @@ class QutritSwap(cirq.Gate):
             ]
         )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     cirq.X(cirq.LineQubit(1))
     QutritPlusGate.on(cirq.LineQid(1, dimension=3))
