@@ -12,6 +12,7 @@ class SingleQubitGateToQutritGate(cirq.Gate):
     """
 
     def __init__(self, gate):
+        self.base_gate = gate
         assert cirq.num_qubits(gate) == 1
         qb_unitary = cirq.unitary(gate)
 
@@ -28,6 +29,9 @@ class SingleQubitGateToQutritGate(cirq.Gate):
     def _unitary_(self):
         return self.qt_unitary
 
+    def _circuit_diagram_info_(self, args):
+        return '{}(01)'.format(str(self.base_gate))
+
 
 class TwoQubitGateToQutritGate(cirq.Gate):
     """Wraps a two-qubit gate in a two-qutrit gate
@@ -39,6 +43,7 @@ class TwoQubitGateToQutritGate(cirq.Gate):
     """
 
     def __init__(self, gate):
+        self.base_gate = gate
         assert cirq.num_qubits(gate) == 2
         qb_unitary = cirq.unitary(gate)
 
@@ -55,6 +60,17 @@ class TwoQubitGateToQutritGate(cirq.Gate):
 
     def _unitary_(self):
         return self.qt_unitary
+
+    def _circuit_diagram_info_(self, args):
+        def wrap_wire_symbol(symbol):
+            if symbol == "@":
+                return "@(1)"  # Controlled on |1>
+            else:
+                return '{}(01)'.format(symbol)
+
+        qubit_diagram_info = cirq.circuit_diagram_info(self.base_gate)
+        new_wire_symbols = (wrap_wire_symbol(symbol) for symbol in qubit_diagram_info.wire_symbols)
+        return qubit_diagram_info.with_wire_symbols(new_wire_symbols)
 
 
 if __name__ == '__main__':
