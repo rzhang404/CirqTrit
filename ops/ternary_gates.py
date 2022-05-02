@@ -22,8 +22,16 @@ class QutritPlusGate(cirq.Gate):
 OneControlledPlusGate = cirq.ControlledGate(
     sub_gate=QutritPlusGate, num_controls=1, control_values=[1], control_qid_shape=(3,)
 )
+OneControlledPlusGate._qid_shape_ = lambda self: (
+    3,
+    3,
+)
 TwoControlledPlusGate = cirq.ControlledGate(
     sub_gate=QutritPlusGate, num_controls=1, control_values=[2], control_qid_shape=(3,)
+)
+TwoControlledPlusGate._qid_shape_ = lambda self: (
+    3,
+    3,
 )
 
 
@@ -46,8 +54,17 @@ class QutritMinusGate(cirq.Gate):
 OneControlledMinusGate = cirq.ControlledGate(
     sub_gate=QutritMinusGate, num_controls=1, control_values=[1], control_qid_shape=(3,)
 )
+
+OneControlledMinusGate._qid_shape_ = lambda self: (
+    3,
+    3,
+)
 TwoControlledMinusGate = cirq.ControlledGate(
     sub_gate=QutritMinusGate, num_controls=1, control_values=[2], control_qid_shape=(3,)
+)
+TwoControlledMinusGate._qid_shape_ = lambda self: (
+    3,
+    3,
 )
 
 

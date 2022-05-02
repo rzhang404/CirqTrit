@@ -27,12 +27,12 @@ noise_simulable_gate_domain = {
     TwoQubitGateToQutritGate(cirq.CZ): 2,
     TwoQubitGateToQutritGate(cirq.SWAP): 2,
     TwoQubitGateToQutritGate(cirq.ISWAP): 2,
-    QutritPlusGate: 1,
-    OneControlledPlusGate: 2,
-    TwoControlledPlusGate: 2,
-    QutritMinusGate: 1,
-    OneControlledMinusGate: 2,
-    TwoControlledMinusGate: 2,
+    # QutritPlusGate: 1,
+    # OneControlledPlusGate: 2,
+    # TwoControlledPlusGate: 2,
+    # QutritMinusGate: 1,
+    # OneControlledMinusGate: 2,
+    # TwoControlledMinusGate: 2,
 }
 circuit = cirq.testing.random_circuit(
     qubits=qutrits,

@@ -1,5 +1,6 @@
 import cirq
 from ops.to_qutrit_wrappers import SingleQubitGateToQutritGate, TwoQubitGateToQutritGate
+from ops.to_qubit_wrappers import SingleQutritGateToQubitGate, TwoQutritGateToQubitGate
 
 
 @cirq.transformer
@@ -16,31 +17,48 @@ def qubit_to_qutrit(circuit: cirq.AbstractCircuit, *, context=None) -> cirq.Circ
     def wrap_gate(op):
         qubits = op.qubits
         q_type = type(qubits[0])
+
+        # Variables to store the new gate and its operands
+        new_gate = None
+        qutrits = None
+
+        # Check if already was wrapped, returning to qutrit
+        if (
+            type(op.gate) == SingleQutritGateToQubitGate
+            or type(op.gate) == TwoQutritGateToQubitGate
+        ):
+            new_gate = op.gate
+
+        # Generate qutrits of the same type
         if len(qubits) == 1:
-            gate = SingleQubitGateToQutritGate(op.gate)
+            new_gate = SingleQubitGateToQutritGate(op.gate)
             if q_type is cirq.LineQubit:
-                return gate.on(cirq.LineQid(qubits[0].x, dimension=3))
+                qutrits = [cirq.LineQid(qubits[0].x, dimension=3)]
             elif q_type is cirq.NamedQubit:
-                return gate.on(cirq.NamedQid(qubits[0].name, dimension=3))
+                qutrits = [cirq.NamedQid(qubits[0].name, dimension=3)]
             elif q_type is cirq.GridQubit:
-                return gate.on(cirq.GridQid(qubits[0].row, qubits[0].col, dimension=3))
+                qutrits = [cirq.GridQid(qubits[0].row, qubits[0].col, dimension=3)]
 
         elif len(qubits) == 2:
-            gate = TwoQubitGateToQutritGate(op.gate)
+            new_gate = TwoQubitGateToQutritGate(op.gate)
             if q_type is cirq.LineQubit:
-                return gate.on(
-                    cirq.LineQid(qubits[0].x, dimension=3), cirq.LineQid(qubits[1].x, dimension=3)
-                )
+                qutrits = [
+                    cirq.LineQid(qubits[0].x, dimension=3),
+                    cirq.LineQid(qubits[1].x, dimension=3),
+                ]
             elif q_type is cirq.NamedQubit:
-                return gate.on(
+                qutrits = [
                     cirq.NamedQid(qubits[0].name, dimension=3),
                     cirq.NamedQid(qubits[1].name, dimension=3),
-                )
+                ]
             elif q_type is cirq.GridQubit:
-                return gate.on(
+                qutrits = [
                     cirq.GridQid(qubits[0].row, qubits[0].col, dimension=3),
                     cirq.GridQid(qubits[1].row, qubits[1].col, dimension=3),
-                )
+                ]
+
+        if new_gate is not None and qutrits is not None:
+            return new_gate.on(*qutrits)
 
         # If reached, either gate acts on more than 2 qubits or
         # the type of qubit used is not supported
@@ -69,27 +87,46 @@ def qutrit_to_qubit(circuit: cirq.AbstractCircuit, *, context=None) -> cirq.Circ
         qutrits = op.qubits
         wrapped_gate = op.gate
         q_type = type(qutrits[0])
-        if type(wrapped_gate) == SingleQubitGateToQutritGate:
-            base_gate = wrapped_gate.base_gate
+
+        # Variables to store the new gate and its operands
+        new_gate = None
+        qubits = None
+
+        # Check if already was wrapped, returning to qutrit
+        if (
+            type(wrapped_gate) == SingleQubitGateToQutritGate
+            or type(wrapped_gate) == TwoQubitGateToQutritGate
+        ):
+            new_gate = wrapped_gate.base_gate
+
+        # Generate qubits of the same type
+        if len(qutrits) == 1:
             if q_type is cirq.LineQid:
-                return base_gate.on(cirq.LineQubit(qutrits[0].x))
+                qubits = [cirq.LineQubit(qutrits[0].x)]
             elif q_type is cirq.NamedQid:
-                return base_gate.on(cirq.NamedQubit(qutrits[0].name))
+                qubits = [cirq.NamedQubit(qutrits[0].name)]
             elif q_type is cirq.GridQid:
-                return base_gate.on(cirq.GridQubit(qutrits[0].row, qutrits[0].col))
-        elif type(wrapped_gate) == TwoQubitGateToQutritGate:
-            base_gate = wrapped_gate.base_gate
+                qubits = [cirq.GridQubit(qutrits[0].row, qutrits[0].col)]
+        elif len(qutrits) == 2:
             if q_type is cirq.LineQid:
-                return base_gate.on(cirq.LineQubit(qutrits[0].x), cirq.LineQubit(qutrits[1].x))
+                qubits = [cirq.LineQubit(qutrits[0].x), cirq.LineQubit(qutrits[1].x)]
             elif q_type is cirq.NamedQid:
-                return base_gate.on(
-                    cirq.NamedQubit(qutrits[0].name), cirq.NamedQubit(qutrits[1].name)
-                )
+                qubits = [cirq.NamedQubit(qutrits[0].name), cirq.NamedQubit(qutrits[1].name)]
             elif q_type is cirq.GridQid:
-                return base_gate.on(
+                qubits = [
                     cirq.GridQubit(qutrits[0].row, qutrits[0].col),
                     cirq.GridQubit(qutrits[1].row, qutrits[1].col),
-                )
+                ]
+
+        else:
+            # Need to wrap this in a qubit gate
+            if len(qutrits) == 1:
+                new_gate = SingleQutritGateToQubitGate(op.gate)
+            elif len(qutrits) == 2:
+                new_gate = TwoQutritGateToQubitGate(op.gate)
+
+        if new_gate is not None and qubits is not None:
+            return new_gate.on(*qubits)
 
         # If reached, either gate acts on more than 2 qutrits,
         # the gate isn't actually a wrapped gate, or
